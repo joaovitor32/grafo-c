@@ -9,96 +9,79 @@ class Node
 {
     int data;
     int search;
-    class Node *parent;
-    class Node *edges;
+    class Node **edges;
 };
 
 class Graph
 {
-    *nodes;
+    class Node **nodes;
     class Node *start;
     class Node *end;
 };
 typedef class Node node;
 typedef class Graph graph;
+
+/*------------ Funções Uteis ---------------*/
+
+int getIndexEdges(class Node **arr)
+{
+    int i = 0;
+    while (arr[i] != NULL)
+    {
+        i++;
+    }
+
+    return i;
+}
+
 /*---------- Métodos do Node ------------*/
 
-node *addEdge(node *node1, node *node2)
+class Node *createNode(int value)
 {
+
+    class Node *newNode = malloc(sizeof(class Node));
+    newNode->data = value;
+    newNode->edges = malloc(sizeof(class node *));
+    newNode->search = 0;
+
+    return newNode;
 }
+
+//Adding Edge in the last position in both arrays of type edge
+void addEdge(class Node *node1, class Node *node2)
+{
+    node1->edges[getIndexEdges(node1->edges)] = node2;
+    node2->edges[getIndexEdges(node2->edges)] = node1;
+}
+
 /*---------- Métodos do Grafo ------------*/
-
-graph *addNode(graph *gph, node *n)
+graph *createGraph(int numVertices)
 {
+    graph *Graph = malloc(sizeof(graph));
+    Graph->nodes = malloc(numVertices * sizeof(class node *));
+    Graph->start = NULL;
+    Graph->end = NULL;
 
-    if (gph->nodes == NULL)
-    {
-        printf("Grafo está vazio!\n\n");
-        return;
-    }
-
-    for (int i = 0; i < GRAPH_SIZE; i++)
-    {
-        if (gph->nodes[i] == NULL)
-        {
-            gph->nodes[i] = n;
-            return;
-        }
-    }
+    return Graph;
 }
 
-graph *getNode(graph *g, int value)
+void printGraph(class Graph *graph, int numVertices)
 {
+    for (int i = 0; i < numVertices; i++)
+    {
+        printf("Index: %i - Value:%d \n ", i, graph->nodes[i]->data);
+    }
 }
 
 int main(void)
 {
-    graph *Graph = (graph *)malloc(sizeof(graph));
+    graph *Graph = createGraph(GRAPH_SIZE);
+    //printGraph(Graph, GRAPH_SIZE);
 
-    Graph->nodes = (class node *)malloc(sizeof(node));
+    node *node1 = createNode(1);
+    node *node2 = createNode(2);
+    node *node3 = createNode(3);
 
-    if (!Graph)
-    {
-        printf("Sem memoria disponivel!\n");
-        exit(1);
-    }
-    else
-    {
-        inicia(Graph);
-        int opt;
-
-        do
-        {
-            opt = menu();
-            opcao(Graph, opt);
-        } while (opt);
-
-        free(Graph);
-        return 0;
-    }
-}
-
-int menu(void)
-{
-    int opt;
-
-    printf("Escolha a opcao\n");
-    printf("0. Sair\n");
-    scanf("%d", &opt);
-
-    return opt;
-}
-
-void opcao(node *Graph, int op)
-{
-    node *tmp;
-    switch (op)
-    {
-    case 0:
-        libera(Graph);
-        break;
-
-    default:
-        printf("Comando invalido\n\n");
-    }
+    addEdge(node1, node2);
+    addEdge(node3, node1);
 }
