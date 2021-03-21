@@ -3,13 +3,20 @@
 #include <string.h>
 #include <inttypes.h>
 #define class struct
-#define GRAPH_SIZE 20
+
+enum search
+{
+    TRUE = 1,
+    FALSE = 0,
+
+} search;
 
 class Node
 {
     int data;
     int search;
     class Node **edges;
+    class Node *parent;
 };
 
 class Graph
@@ -22,7 +29,7 @@ typedef class Node node;
 typedef class Graph graph;
 
 /*------------ Funções Uteis ---------------*/
-
+//Pega último index
 int getIndexEdges(class Node **arr)
 {
     int i = 0;
@@ -41,8 +48,8 @@ class Node *createNode(int value)
 
     class Node *newNode = malloc(sizeof(class Node));
     newNode->data = value;
-    newNode->edges = malloc(sizeof(class node *));
     newNode->search = 0;
+    newNode->edges = malloc(sizeof(class node *));
 
     return newNode;
 }
@@ -55,28 +62,87 @@ void addEdge(class Node *node1, class Node *node2)
 }
 
 /*---------- Métodos do Grafo ------------*/
-graph *createGraph(int numVertices)
+graph *createGraph()
 {
     graph *Graph = malloc(sizeof(graph));
-    Graph->nodes = malloc(numVertices * sizeof(class node *));
+    Graph->nodes = malloc(sizeof(class node *));
     Graph->start = NULL;
     Graph->end = NULL;
 
     return Graph;
 }
 
-void printGraph(class Graph *graph, int numVertices)
+void addNode(class Graph *graph, class Node *node)
 {
-    for (int i = 0; i < numVertices; i++)
+    int index = getIndexEdges(graph->nodes);
+    graph->nodes[index] = node;
+}
+
+node *getNode(class Graph *graph, int index)
+{
+    return graph->nodes[index];
+}
+
+node *setStart(class Graph *graph, int index)
+{
+    class Node *start = graph->nodes[index];
+    graph->start = start;
+    return start;
+}
+
+node *setEnd(class Graph *graph, int index)
+{
+    class Node *end = graph->nodes[index];
+    graph->end = end;
+    return end;
+}
+
+void getPathBFS(class Graph *graph)
+{
+    class Node *path = malloc(sizeof(class Node));
+    class Node *next = malloc(sizeof(class Node));
+
+    path[0] = *graph->end;
+    next = graph->end->parent;
+
+    int i = 1;
+    while (next != NULL)
+    {
+        path[i] = *next;
+        next = next->parent;
+        i++;
+    }
+
+    int j = 0;
+    while (&path[j] != NULL)
+    {
+        printf("%d", path[j].data);
+    }
+}
+
+void BFS(class Graph *graph, int start, int end)
+{
+    class Node *queue = malloc(sizeof(class Node));
+}
+
+void DFS()
+{
+}
+
+void printGraph(class Graph *graph)
+{
+
+    int i = 0;
+    while (graph->nodes[i] != NULL)
     {
         printf("Index: %i - Value:%d \n ", i, graph->nodes[i]->data);
+        ++i;
     }
 }
 
 int main(void)
 {
-    graph *Graph = createGraph(GRAPH_SIZE);
-    //printGraph(Graph, GRAPH_SIZE);
+    graph *Graph = createGraph();
 
     node *node1 = createNode(1);
     node *node2 = createNode(2);
@@ -84,4 +150,10 @@ int main(void)
 
     addEdge(node1, node2);
     addEdge(node3, node1);
+
+    addNode(Graph, node1);
+    addNode(Graph, node2);
+    addNode(Graph, node3);
+
+    printGraph(Graph);
 }
