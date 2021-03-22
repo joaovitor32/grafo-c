@@ -61,7 +61,7 @@ class Node *createNode(int value)
 
     class Node *newNode = malloc(sizeof(class Node));
     newNode->data = value;
-    newNode->search = 0;
+    newNode->search = FALSE;
     newNode->edges = malloc(sizeof(class node *));
 
     return newNode;
@@ -77,8 +77,8 @@ void addEdge(class Node *node1, class Node *node2)
 /*---------- Métodos do Grafo ------------*/
 graph *createGraph()
 {
-    graph *Graph = malloc(sizeof(graph));
-    Graph->nodes = malloc(sizeof(class node *));
+    graph *Graph = (class Graph *)malloc(sizeof(graph));
+    Graph->nodes = (class Node *)malloc(sizeof(class node *));
     Graph->start = NULL;
     Graph->end = NULL;
 
@@ -144,10 +144,16 @@ node *pop(class Queue *queue, int index)
     return element;
 }
 
+void append(class Queue *queue, class Node node)
+{
+    int index = getIndexEdges(queue->nodes);
+    queue->nodes[index] = node;
+}
+
 void BFS(class Graph *graph, int start, int end)
 {
     class Queue *queue = malloc(sizeof(class Queue));
-    class Edge *edges = malloc(sizeof(class Edges));
+    class Edge **edges = malloc(sizeof(class Edges));
     class Node *current = malloc(sizeof(class Node));
     class Node *neighbor = malloc(sizeof(class Node));
     graph->start = graph->nodes[start];
@@ -166,8 +172,15 @@ void BFS(class Graph *graph, int start, int end)
         else
         {
             edges = current->edges;
-            while (edges[0] != NULL)
+            while (edges[i] != NULL)
             {
+                neighbor = edges[i];
+                if (neighbor->search == FALSE)
+                {
+                    neighbor->search = TRUE;
+                    neighbor->parent = current;
+                    append(queue, *neighbor);
+                }
             }
             i++;
         }
@@ -211,4 +224,6 @@ int main(void)
     addNode(Graph, node5);
 
     printGraph(Graph);
+
+    free(Graph);
 }
