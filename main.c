@@ -25,8 +25,21 @@ class Graph
     class Node *start;
     class Node *end;
 };
+
+class Queue
+{
+    class Node *nodes;
+};
+
+class Edges
+{
+    class Node *nodes;
+};
+
 typedef class Node node;
 typedef class Graph graph;
+typedef class Queue queue;
+typedef class Edges edges;
 
 /*------------ Funções Uteis ---------------*/
 //Pega último index
@@ -120,9 +133,45 @@ void getPathBFS(class Graph *graph)
     }
 }
 
+/*Provavelmente isso vai dar erro - Talvez a me
+Talvez esteja sendo apontado um espaço na memória 
+incompatível
+*/
+node *pop(class Queue *queue, int index)
+{
+    class Node *element = &queue->nodes[index];
+    free(&queue->nodes[index]);
+    return element;
+}
+
 void BFS(class Graph *graph, int start, int end)
 {
-    class Node *queue = malloc(sizeof(class Node));
+    class Queue *queue = malloc(sizeof(class Queue));
+    class Edge *edges = malloc(sizeof(class Edges));
+    class Node *current = malloc(sizeof(class Node));
+    class Node *neighbor = malloc(sizeof(class Node));
+    graph->start = graph->nodes[start];
+    graph->end = graph->nodes[end];
+
+    int i = 0;
+    queue->nodes[0] = *graph->start;
+    while (getIndexEdges(queue->nodes) > 0)
+    {
+        current = pop(queue, 0);
+        if (current == graph->end)
+        {
+            printf("End node was found!");
+            break;
+        }
+        else
+        {
+            edges = current->edges;
+            while (edges[0] != NULL)
+            {
+            }
+            i++;
+        }
+    }
 }
 
 void DFS()
@@ -147,13 +196,19 @@ int main(void)
     node *node1 = createNode(1);
     node *node2 = createNode(2);
     node *node3 = createNode(3);
+    node *node4 = createNode(4);
+    node *node5 = createNode(5);
 
     addEdge(node1, node2);
     addEdge(node3, node1);
+    addEdge(node4, node5);
+    addEdge(node2, node5);
 
     addNode(Graph, node1);
     addNode(Graph, node2);
     addNode(Graph, node3);
+    addNode(Graph, node4);
+    addNode(Graph, node5);
 
     printGraph(Graph);
 }
