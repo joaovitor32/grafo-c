@@ -17,6 +17,7 @@ class Node
     int search;
     class Node **edges;
     class Node *parent;
+    int edgesArrayLength;
 };
 
 class Graph
@@ -24,34 +25,27 @@ class Graph
     class Node **nodes;
     class Node *start;
     class Node *end;
+    int nodeArrayLength;
 };
 
 class Queue
 {
-    class Node *nodes;
-};
-
-class Edges
-{
-    class Node *nodes;
+    int nodesArrayLength;
+    class Node **nodes;
 };
 
 typedef class Node node;
 typedef class Graph graph;
 typedef class Queue queue;
-typedef class Edges edges;
 
-/*------------ Funções Uteis ---------------*/
-//Pega último index
-int getIndexEdges(class Node **arr)
+/*------------------- Método de Queue --------------------*/
+
+queue *createQueue()
 {
-    int i = 0;
-    while (arr[i] != NULL)
-    {
-        i++;
-    }
-
-    return i;
+    queue *Queue = (class Queue *)malloc(sizeof(queue));
+    Queue->nodes = malloc(sizeof(class node *));
+    Queue->nodesArrayLength = 0;
+    return Queue;
 }
 
 /*---------- Métodos do Node ------------*/
@@ -63,32 +57,31 @@ class Node *createNode(int value)
     newNode->data = value;
     newNode->search = FALSE;
     newNode->edges = malloc(sizeof(class node *));
-
+    newNode->edgesArrayLength = 0;
     return newNode;
 }
 
 //Adding Edge in the last position in both arrays of type edge
 void addEdge(class Node *node1, class Node *node2)
 {
-    node1->edges[getIndexEdges(node1->edges)] = node2;
-    node2->edges[getIndexEdges(node2->edges)] = node1;
+    node1->edges[node1->edgesArrayLength++] = node2;
+    node2->edges[node2->edgesArrayLength++] = node1;
 }
 
 /*---------- Métodos do Grafo ------------*/
 graph *createGraph()
 {
     graph *Graph = (class Graph *)malloc(sizeof(graph));
-    Graph->nodes = (class Node *)malloc(sizeof(class node *));
+    Graph->nodes = malloc(sizeof(class node *));
     Graph->start = NULL;
     Graph->end = NULL;
-
+    Graph->nodeArrayLength = 0;
     return Graph;
 }
 
 void addNode(class Graph *graph, class Node *node)
 {
-    int index = getIndexEdges(graph->nodes);
-    graph->nodes[index] = node;
+    graph->nodes[graph->nodeArrayLength++] = node;
 }
 
 node *getNode(class Graph *graph, int index)
@@ -135,35 +128,45 @@ void getPathBFS(class Graph *graph)
 
 /*Provavelmente isso vai dar erro - Talvez a me
 Talvez esteja sendo apontado um espaço na memória 
-incompatível
+incompatível, POP no nosso caso sempre vai retirar o
+primeiro elemento
 */
-node *pop(class Queue *queue, int index)
+node *pop(class Queue *queue)
 {
-    class Node *element = &queue->nodes[index];
-    free(&queue->nodes[index]);
+    class Node *element = queue->nodes[0];
+    //free(queue->nodes[0]);
+
+    for (int i = 0; i < queue->nodesArrayLength; i++)
+    {
+        queue->nodes[i] = queue->nodes[i++];
+    }
+    queue->nodesArrayLength--;
+
     return element;
 }
 
-void append(class Queue *queue, class Node node)
+void append(class Queue *queue, class Node *node)
 {
-    int index = getIndexEdges(queue->nodes);
-    queue->nodes[index] = node;
+    int index = queue->nodesArrayLength++;
+    queue->nodes[index++] = node;
 }
 
 void BFS(class Graph *graph, int start, int end)
 {
-    class Queue *queue = malloc(sizeof(class Queue));
-    class Edge **edges = malloc(sizeof(class Edges));
+
+    class Queue *queue = createQueue();
     class Node *current = malloc(sizeof(class Node));
     class Node *neighbor = malloc(sizeof(class Node));
     graph->start = graph->nodes[start];
     graph->end = graph->nodes[end];
 
-    int i = 0;
-    queue->nodes[0] = *graph->start;
-    while (getIndexEdges(queue->nodes) > 0)
+    append(queue, graph->start);
+
+    while (queue->nodesArrayLength > 0)
     {
-        current = pop(queue, 0);
+
+        current = pop(queue);
+
         if (current == graph->end)
         {
             printf("End node was found!");
@@ -171,34 +174,30 @@ void BFS(class Graph *graph, int start, int end)
         }
         else
         {
-            edges = current->edges;
-            while (edges[i] != NULL)
+            for (int i = 0; i < current->edgesArrayLength; i++)
             {
-                neighbor = edges[i];
+
+                neighbor = current->edges[i];
+
                 if (neighbor->search == FALSE)
                 {
+
                     neighbor->search = TRUE;
                     neighbor->parent = current;
-                    append(queue, *neighbor);
+                    append(queue, neighbor);
                 }
+                i++;
             }
-            i++;
         }
     }
-}
-
-void DFS()
-{
+    getPathBFS(graph);
 }
 
 void printGraph(class Graph *graph)
 {
-
-    int i = 0;
-    while (graph->nodes[i] != NULL)
+    for (int i = 0; i < graph->nodeArrayLength; i++)
     {
         printf("Index: %i - Value:%d \n ", i, graph->nodes[i]->data);
-        ++i;
     }
 }
 
@@ -206,24 +205,22 @@ int main(void)
 {
     graph *Graph = createGraph();
 
-    node *node1 = createNode(1);
-    node *node2 = createNode(2);
-    node *node3 = createNode(3);
-    node *node4 = createNode(4);
-    node *node5 = createNode(5);
+    node *node1 = createNode(11);
+    node *node2 = createNode(22);
+    node *node3 = createNode(33);
+    node *node4 = createNode(44);
 
     addEdge(node1, node2);
     addEdge(node3, node1);
-    addEdge(node4, node5);
-    addEdge(node2, node5);
+    addEdge(node4, node1);
+    addEdge(node2, node3);
 
     addNode(Graph, node1);
     addNode(Graph, node2);
     addNode(Graph, node3);
     addNode(Graph, node4);
-    addNode(Graph, node5);
 
-    printGraph(Graph);
+    BFS(Graph, 0, 2);
 
     free(Graph);
 }
