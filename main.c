@@ -179,12 +179,9 @@ void BFS(class Graph *graph, int start, int end)
         {
             for (int i = 0; i < current->edgesArrayLength; i++)
             {
-
                 neighbor = current->edges[i];
-
                 if (neighbor->search == FALSE)
                 {
-
                     neighbor->search = TRUE;
                     neighbor->parent = current;
                     append(queue, neighbor);
