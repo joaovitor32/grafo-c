@@ -119,10 +119,10 @@ void getPathBFS(class Graph *graph)
         i++;
     }
 
-    int j = 0;
-    while (&path[j] != NULL)
+    printf("Percorrendo o grafo: \n");
+    for (int j = 0; j < i; j++)
     {
-        printf("%d", path[j].data);
+        printf("%d-> %d\n", j, path[j].data);
     }
 }
 
@@ -134,7 +134,7 @@ primeiro elemento
 node *pop(class Queue *queue)
 {
     class Node *element = queue->nodes[0];
-    //free(queue->nodes[0]);
+    free(&queue->nodes[0]);
 
     for (int i = 0; i < queue->nodesArrayLength; i++)
     {
@@ -147,10 +147,9 @@ node *pop(class Queue *queue)
 
 void append(class Queue *queue, class Node *node)
 {
-    int index = queue->nodesArrayLength++;
-    queue->nodes[index++] = node;
+    queue->nodes[queue->nodesArrayLength++] = node;
 }
-
+// Start and End are indexes
 void BFS(class Graph *graph, int start, int end)
 {
 
@@ -159,6 +158,10 @@ void BFS(class Graph *graph, int start, int end)
     class Node *neighbor = malloc(sizeof(class Node));
     graph->start = graph->nodes[start];
     graph->end = graph->nodes[end];
+    graph->start->search = TRUE;
+
+    printf("Start: %d\n", graph->start->data);
+    printf("End: %d\n", graph->end->data);
 
     append(queue, graph->start);
 
@@ -167,9 +170,9 @@ void BFS(class Graph *graph, int start, int end)
 
         current = pop(queue);
 
-        if (current == graph->end)
+        if (current->data == graph->end->data)
         {
-            printf("End node was found!");
+            printf("End node was found!\n");
             break;
         }
         else
@@ -186,7 +189,6 @@ void BFS(class Graph *graph, int start, int end)
                     neighbor->parent = current;
                     append(queue, neighbor);
                 }
-                i++;
             }
         }
     }
@@ -212,15 +214,16 @@ int main(void)
 
     addEdge(node1, node2);
     addEdge(node3, node1);
-    addEdge(node4, node1);
+    addEdge(node3, node1);
     addEdge(node2, node3);
+    addEdge(node4, node3);
 
     addNode(Graph, node1);
     addNode(Graph, node2);
     addNode(Graph, node3);
     addNode(Graph, node4);
 
-    BFS(Graph, 0, 2);
+    BFS(Graph, 3, 0);
 
     free(Graph);
 }
