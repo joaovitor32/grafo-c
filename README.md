@@ -1,4 +1,4 @@
-<h5>Run the following commands:</h5>
+<h5>Run the following commands on the terminal:</h5>
 
 
 ```bash
